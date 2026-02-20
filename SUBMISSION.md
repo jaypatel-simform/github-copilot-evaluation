@@ -56,17 +56,17 @@ If any task marked as completed, then further it should not be modified.
 ## Design Decisions (optional)
 <!-- Explain key architectural or implementation decisions you made and why -->
 
-- **Decision 1:** [e.g., "Used a singleton service for in-memory task storage"]
-  - **Reasoning:** [e.g., "To maintain state consistency across API calls without a database"]
+- **Decision 1:** Implemented layered architecture (Routes → Controllers → Services)
+  - **Reasoning:** Separation of concerns makes the code maintainable and testable. Routes handle HTTP specifics, controllers orchestrate business logic, and services manage data. This structure makes it easy to replace in-memory storage with a database later.
 
-- **Decision 1:** [e.g., "Used a singleton service for in-memory task storage"]
-  - **Reasoning:** [e.g., "To maintain state consistency across API calls without a database"]
+- **Decision 2:** Custom error class hierarchy with proper HTTP status codes
+  - **Reasoning:** Provides consistent error handling across the application (NotFoundError-404, ForbiddenError-403, ValidationError-400). Makes error responses predictable and easier to handle on the frontend.
 
-- **Decision 2:** [e.g., "Implemented reactive forms instead of template-driven"]
-  - **Reasoning:** [e.g., "Better type safety and validation control"]
+- **Decision 3:** Winston logger with structured logging format
+  - **Reasoning:** Production-grade logging with timestamps, log levels, and request tracking. Format: `[METHOD] /endpoint - Execution time: Xms` provides clear visibility into API performance and helps with debugging and monitoring.
 
-- **Decision 3:** 
-  - **Reasoning:** 
+- **Decision 4:** Business rule enforcement (automatic due dates and immutable completed tasks)
+  - **Reasoning:** HIGH priority tasks automatically get 7-day deadlines to prevent oversight. Completed tasks become immutable (403 Forbidden) to preserve audit trail and maintain data integrity. 
 
 ## Challenges Faced
 <!-- Optional: Describe any challenges encountered and how you overcame them -->
