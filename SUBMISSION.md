@@ -2,26 +2,62 @@
 
 ## Track Chosen
 <!-- Mark your choice with [x] -->
-- [ ] Backend Only
+- [X] Backend Only
 - [ ] Frontend Only
 - [ ] Full-Stack (Both)
 
 ## GitHub Copilot Usage Summary
 <!-- Describe how you used AI throughout the test. Be specific about when and how you leveraged AI tools. -->
 
-[Write your response here]
+ - I used the Github copilot AI to generate the task management system by giving prompt based on the requirement.
+ - By giving the clear requirement and prompt It create the complete system properly.
 
 ## Key Prompts Used
-<!-- List 3-5 important prompts you used with your AI assistant -->
 
-1. [Example: "Create a RESTful API endpoint for creating ..."]
-2. [Example: "How to implement reactive forms in Angular with ..."]
-3. [Example: "Debug TypeScript error in task service HTTP request"]
-4. 
-5. 
+1. Here is the boilerplat repo of the expressJs project in the backend folder.
+First review the existing backend folder structure.
+In this backend need to implement the Task management system using the REST API.
+
+It should have task create, list, edit, delete features.
+
+Note:
+
+use in memory database as this is for the POC purpose.
+add proper error handling in the operations and the API calls.
+You can choose proper fields for the task but it should have the field for the status management
+Also add input validations as well using joi.
+I also attached the backend/README.md -- you can utilize that the further context (But do not modify that)
+As it's for the POC purpose, skip extra feature or file from the creation and skip
+
+2. Now, we need to keep this fuuntionality as it is. But with this upgrade the implementation as per below check list:
+
+proper error handling and logging (use console log for the POC)
+it should be production safe implementation.
+
+3. Now we have the modify in the logging requirement, as we used console log initially but now let's replace it by the Winston logger.
+Log should print > req method, URL, execution time,
+Log format: [METHOD] /endpoint - Execution time: Xms.
+
+4. Based on the task routes and task validator, create API_ROUTES.md file, in which add all the API endpoint with it's request and response details.
+Note: this will be utilize for the front end reference for the API integration.
+
+5. Now let's add new requirement as below:
+
+Add priority field in task (High,low, mid) and due date as well.
+If the priority is high, set the due date automatically next 7th date.
+Also add sort by due date feature.
+
+Note: It should capture all the incomming requests.
+
+6. Let's add one more, validation for the task modification.
+If any task marked as completed, then further it should not be modified.
+
 
 ## Design Decisions (optional)
 <!-- Explain key architectural or implementation decisions you made and why -->
+
+- **Decision 1:** [e.g., "Used a singleton service for in-memory task storage"]
+  - **Reasoning:** [e.g., "To maintain state consistency across API calls without a database"]
 
 - **Decision 1:** [e.g., "Used a singleton service for in-memory task storage"]
   - **Reasoning:** [e.g., "To maintain state consistency across API calls without a database"]
