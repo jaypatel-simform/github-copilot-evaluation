@@ -33,4 +33,4 @@ COPY --from=builder /app/dist ./dist
 EXPOSE 3000
 
 # Start app
-CMD ["node", "dist/main.js"]
+CMD ["npm", "run", "start"]

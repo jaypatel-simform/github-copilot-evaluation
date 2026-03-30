@@ -1,47 +1,57 @@
 version: 0.2
 
 phases:
+  # Pre-build phase: Authenticate to ECR and prepare build variables
   pre_build:
-  commands:
-    - echo Logging in to Amazon ECR...
-    - aws --version
+    commands:
+      - echo Logging in to Amazon ECR...
+      # Check AWS CLI version for debugging
+      - aws --version
+      # Construct the full ECR repository URI
+      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
+      # Authenticate Docker to Amazon ECR
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $REPOSITORY_URI
+      # Extract first 7 characters of commit hash for versioning
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      # Set image tag to commit hash or default to 'latest'
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+      # Log the values for debugging
+      - echo Repository URI is $REPOSITORY_URI
+      - echo Image tag is $IMAGE_TAG
 
-    - AWS_REGISTRY=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
-    - REPOSITORY_URI=$AWS_REGISTRY/$IMAGE_REPO_NAME
-
-    - echo "Registry: $AWS_REGISTRY"
-    - echo "Repository: $REPOSITORY_URI"
-
-    - aws ecr get-login-password --region $AWS_DEFAULT_REGION \
-      | docker login --username AWS --password-stdin $AWS_REGISTRY
-
-    - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-    - IMAGE_TAG=${COMMIT_HASH:=latest}
-
-    - echo Image tag is $IMAGE_TAG
-
+  # Build phase: Create and tag Docker image
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t $IMAGE_REPO_NAME:latest .
+      # Build Docker image from backend directory
+      - docker build -t $IMAGE_REPO_NAME:latest ./backend
+      # Tag image with 'latest' for ECR
       - docker tag $IMAGE_REPO_NAME:latest $REPOSITORY_URI:latest
+      # Tag image with commit hash for ECR
       - docker tag $IMAGE_REPO_NAME:latest $REPOSITORY_URI:$IMAGE_TAG
 
+  # Post-build phase: Push images to ECR and create deployment artifact
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker images...
+      # Push latest tag to ECR
       - docker push $REPOSITORY_URI:latest
+      # Push commit-specific tag to ECR
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - echo Writing image definitions file...
+      # Generate imagedefinitions.json for ECS deployment
       - printf '[{"name":"%s","imageUri":"%s"}]' $CONTAINER_NAME $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      # Display the generated file contents
       - cat imagedefinitions.json
 
+# Artifacts to be used by ECS for deployment
 artifacts:
   files:
     - imagedefinitions.json
 
+# Cache npm dependencies to speed up future builds
 cache:
   paths:
     - '/root/.npm/**/*'
