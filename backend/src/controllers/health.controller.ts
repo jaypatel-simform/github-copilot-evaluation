@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
 
 export const getHealth = (req: Request, res: Response): void => {
-  res.status(200).json({ status: 'ok' });
+  res.status(200).json({ status: 'Welcome to the API' });
 };
