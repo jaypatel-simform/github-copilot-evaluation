@@ -100,10 +100,14 @@ Content-Type: application/json
 
 **GET** `/tasks`
 
-Retrieves all tasks from the system. Supports sorting by due date.
+Retrieves all tasks from the system. Supports filtering and sorting.
 
 #### Query Parameters
 - `sortByDueDate` (optional) - Set to `true` to sort tasks by due date in ascending order
+- `status` (optional) - Filter tasks by status. One of: `TODO`, `IN_PROGRESS`, `COMPLETED`
+- `priority` (optional) - Filter tasks by priority. One of: `HIGH`, `MID`, `LOW`
+- `dueDateFrom` (optional) - Filter tasks with due date on or after this date (ISO format)
+- `dueDateTo` (optional) - Filter tasks with due date on or before this date (ISO format). Must be greater than or equal to `dueDateFrom` when both are provided.
 
 #### Request Headers
 None required
@@ -115,6 +119,11 @@ None
 ```
 GET /tasks
 GET /tasks?sortByDueDate=true
+GET /tasks?status=TODO
+GET /tasks?priority=HIGH
+GET /tasks?status=IN_PROGRESS&priority=MID
+GET /tasks?dueDateFrom=2026-01-01T00:00:00.000Z&dueDateTo=2026-06-30T23:59:59.000Z
+GET /tasks?status=TODO&sortByDueDate=true&dueDateFrom=2026-01-01T00:00:00.000Z
 ```
 
 #### Success Response (200)
@@ -451,6 +460,7 @@ DELETE /tasks/550e8400-e29b-41d4-a716-446655440000
 7. **Status Updates**: When updating a task, you can change the status without providing other fields
 8. **Priority Automation**: HIGH priority tasks automatically get a due date of 7 days if not specified
 9. **Sorting**: Use `?sortByDueDate=true` query parameter to get tasks sorted by due date
+10. **Filtering**: Use `?status=TODO`, `?priority=HIGH`, `?dueDateFrom=<ISO date>`, or `?dueDateTo=<ISO date>` to filter tasks. Multiple filters can be combined.
 10. **Due Date Management**: Tasks can have custom due dates, or they can be auto-calculated based on priority
 11. **Completed Tasks**: Once a task is marked as `COMPLETED`, it becomes immutable and cannot be modified
 
@@ -474,9 +484,22 @@ const createTask = async (taskData) => {
 
 ### Get All Tasks
 ```typescript
-const getAllTasks = async (sortByDueDate = false) => {
-  const url = sortByDueDate 
-    ? 'http://localhost:3000/api/tasks?sortByDueDate=true'
+const getAllTasks = async (options: {
+  sortByDueDate?: boolean;
+  status?: 'TODO' | 'IN_PROGRESS' | 'COMPLETED';
+  priority?: 'HIGH' | 'MID' | 'LOW';
+  dueDateFrom?: string;
+  dueDateTo?: string;
+} = {}) => {
+  const params = new URLSearchParams();
+  if (options.sortByDueDate) params.set('sortByDueDate', 'true');
+  if (options.status) params.set('status', options.status);
+  if (options.priority) params.set('priority', options.priority);
+  if (options.dueDateFrom) params.set('dueDateFrom', options.dueDateFrom);
+  if (options.dueDateTo) params.set('dueDateTo', options.dueDateTo);
+  const query = params.toString();
+  const url = query
+    ? `http://localhost:3000/api/tasks?${query}`
     : 'http://localhost:3000/api/tasks';
   const response = await fetch(url);
   return response.json();
