@@ -36,3 +36,10 @@ export interface UpdateTaskDto {
   priority?: TaskPriority;
   dueDate?: Date;
 }
+
+export interface TaskFilterDto {
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  dueDateFrom?: Date;
+  dueDateTo?: Date;
+}

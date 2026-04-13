@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { taskStore } from '../services/task.service';
-import { CreateTaskDto, UpdateTaskDto } from '../models/task.model';
+import { CreateTaskDto, UpdateTaskDto, TaskFilterDto, TaskStatus, TaskPriority } from '../models/task.model';
 import { NotFoundError, InternalServerError } from '../utils/errors';
 import { logger } from '../utils/logger';
 
@@ -28,11 +28,31 @@ export const createTask = (req: Request, res: Response, next: NextFunction): voi
 
 export const getAllTasks = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    const sortByDueDate = req.query.sortByDueDate === 'true';
+    const validatedQuery = req.query as Partial<TaskFilterDto> & {
+      sortByDueDate?: boolean;
+      status?: TaskStatus;
+      priority?: TaskPriority;
+    };
+
+    const sortByDueDate = validatedQuery.sortByDueDate ?? false;
+
+    const filters: TaskFilterDto = {};
+    if (validatedQuery.status) {
+      filters.status = validatedQuery.status;
+    }
+    if (validatedQuery.priority) {
+      filters.priority = validatedQuery.priority;
+    }
+    if (validatedQuery.dueDateFrom) {
+      filters.dueDateFrom = validatedQuery.dueDateFrom;
+    }
+    if (validatedQuery.dueDateTo) {
+      filters.dueDateTo = validatedQuery.dueDateTo;
+    }
     
-    logger.info('Fetching all tasks', { sortByDueDate });
+    logger.info('Fetching all tasks', { sortByDueDate, filters });
     
-    const tasks = taskStore.findAll(sortByDueDate);
+    const tasks = taskStore.findAll(sortByDueDate, filters);
     
     logger.info('Tasks retrieved successfully', { count: tasks.length, sorted: sortByDueDate });
     
