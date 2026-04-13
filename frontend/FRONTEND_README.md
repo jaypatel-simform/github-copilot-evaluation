@@ -126,7 +126,7 @@ The frontend connects to the backend API endpoints:
 
 ## Technology Stack
 
-- **React** 18.x - UI library
+- **React** 19.2.5 - UI library
 - **TypeScript** - Type safety
 - **CSS3** - Styling with flexbox and grid
 - **Fetch API** - HTTP requests
