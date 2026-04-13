@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import cors from 'cors';
 import healthRoutes from './routes/health.routes';
 import taskRoutes from './routes/task.routes';
 import { errorHandler } from './middleware/errorHandler';
@@ -8,6 +9,9 @@ const app: Application = express();
 
 // Request logging middleware (should be first)
 app.use(requestLogger);
+
+// CORS middleware
+app.use(cors());
 
 // Body parsing middleware
 app.use(express.json());
