@@ -6,9 +6,9 @@ import {
   updateTask,
   deleteTask
 } from '../controllers/task.controller';
-import { validate } from '../middleware/validation';
+import { validate, validateQuery } from '../middleware/validation';
 import { validateUUID } from '../middleware/validateUUID';
-import { createTaskSchema, updateTaskSchema } from '../validators/task.validator';
+import { createTaskSchema, updateTaskSchema, getTasksQuerySchema } from '../validators/task.validator';
 
 const router = Router();
 
@@ -16,7 +16,7 @@ const router = Router();
 router.post('/tasks', validate(createTaskSchema), createTask);
 
 // Get all tasks
-router.get('/tasks', getAllTasks);
+router.get('/tasks', validateQuery(getTasksQuerySchema), getAllTasks);
 
 // Get a specific task by ID
 router.get('/tasks/:id', validateUUID('id'), getTaskById);

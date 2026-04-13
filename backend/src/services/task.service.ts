@@ -1,4 +1,4 @@
-import { Task, CreateTaskDto, UpdateTaskDto, TaskStatus, TaskPriority } from '../models/task.model';
+import { Task, CreateTaskDto, UpdateTaskDto, TaskFilterDto, TaskStatus, TaskPriority } from '../models/task.model';
 import { randomUUID } from 'node:crypto';
 import { logger } from '../utils/logger';
 import { ForbiddenError } from '../utils/errors';
@@ -66,16 +66,34 @@ class TaskStore {
     }
   }
 
-  findAll(sortByDueDate = false): Task[] {
+  findAll(sortByDueDate = false, filters: TaskFilterDto = {}): Task[] {
     try {
-      const tasks = Array.from(this.tasks.values());
-      
+      let tasks = Array.from(this.tasks.values());
+
+      if (filters.status) {
+        tasks = tasks.filter(task => task.status === filters.status);
+      }
+
+      if (filters.priority) {
+        tasks = tasks.filter(task => task.priority === filters.priority);
+      }
+
+      if (filters.dueDateFrom) {
+        const from = new Date(filters.dueDateFrom).getTime();
+        tasks = tasks.filter(task => new Date(task.dueDate).getTime() >= from);
+      }
+
+      if (filters.dueDateTo) {
+        const to = new Date(filters.dueDateTo).getTime();
+        tasks = tasks.filter(task => new Date(task.dueDate).getTime() <= to);
+      }
+
       if (sortByDueDate) {
         tasks.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
         logger.debug('Tasks sorted by due date', { count: tasks.length });
       }
       
-      logger.debug('Retrieved all tasks from memory', { count: tasks.length, sorted: sortByDueDate });
+      logger.debug('Retrieved all tasks from memory', { count: tasks.length, sorted: sortByDueDate, filters });
       return tasks;
     } catch (error) {
       logger.error('Error in task store findAll', { 

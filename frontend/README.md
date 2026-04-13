@@ -1,130 +1,46 @@
-# Frontend Setup
+# Getting Started with Create React App
 
-This folder contains a minimal Angular application for the AI-Assisted Developer Evaluation Test.
-
-## Prerequisites
-
-- Node.js (v18+ recommended)
-- npm or yarn
-- Angular CLI (install globally: `npm install -g @angular/cli`)
-
-## Installation
-
-```bash
-cd frontend
-npm install
-```
-
-## Running the Frontend
-
-### Development Server
-
-```bash
-npm start
-```
-
-The Angular app will run on **http://localhost:4200**
-
-Navigate to [http://localhost:4200](http://localhost:4200) in your browser. The application will automatically reload if you change any source files.
-
-## For Frontend-Only Candidates
-
-### Important: Use the Mock API
-
-If you're working on frontend only, you **must** use the provided mock API:
-
-1. **Start the Mock API first** (in a separate terminal):
-   ```bash
-   cd mock-api
-   npm install
-   npm start
-   ```
-   Mock API runs on **http://localhost:3001**
-
-2. **Then start the frontend** (in another terminal):
-   ```bash
-   cd frontend
-   npm start
-   ```
-
-3. **Configure your service** to use the Mock API base URL: `http://localhost:3001`
-
-📘 **See [../mock-api/README.md](../mock-api/README.md) for full API documentation**
-
-### Verify Mock API
-
-Visit [http://localhost:3001/tasks](http://localhost:3001/tasks) to see the initial task structure.
-
-## For Full-Stack Candidates
-
-If you're implementing both backend and frontend:
-
-1. **Start your backend** (in one terminal):
-   ```bash
-   cd backend
-   npm run dev
-   ```
-   Backend runs on **http://localhost:3000**
-
-2. **Start the frontend** (in another terminal):
-   ```bash
-   cd frontend
-   npm start
-   ```
-
-3. **Configure your service** to use your backend API: `http://localhost:3000`
-
-## Project Structure
-
-```
-frontend/
-├── src/
-│   ├── app/
-│   │   ├── app.module.ts           # Main module
-│   │   ├── app-routing.module.ts   # Routing configuration
-│   │   ├── app.component.ts        # Root component
-│   │   ├── app.component.html      # Root template
-│   │   └── components/             # Feature components
-│   │       ├── home/               # Home component
-│   │       └── health/             # Health component
-│   ├── index.html                  # Main HTML
-│   ├── main.ts                     # Application entry point
-│   └── styles.css                  # Global styles
-├── angular.json                    # Angular configuration
-├── package.json
-└── tsconfig.json                   # TypeScript configuration
-```
-
-## What's Already Set Up
-
-✅ Angular application bootstrap  
-✅ Basic routing (Home and Health routes)  
-✅ HttpClientModule imported (ready for API calls)  
-✅ Component structure  
-✅ Minimal global styles  
-
-## For Your Implementation
-
-You need to:
-- Create a task management component
-- Build forms for creating/editing tasks
-- Create a service to handle API calls
-- Implement proper error handling
-- Add loading states for async operations
-- Display tasks in a user-friendly way
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
 
-- `npm start` - Start the development server
-- `npm run build` - Build the project for production
-- `npm test` - Execute unit tests (if implemented)
+In the project directory, you can run:
 
-## Tips
+### `npm start`
 
-- Use Angular's **Reactive Forms** for form handling
-- Create a **service** to encapsulate all HTTP calls
-- Use **TypeScript interfaces** for type safety
-- Handle **loading and error states** in your components
-- Keep components **focused and reusable**
+Runs the app in the development mode.\
+Open [http://localhost:3001](http://localhost:3001) to view it in the browser.
 
-Good luck! 🚀
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
+
+### `npm test`
+
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+### `npm run build`
+
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
+
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### `npm run eject`
+
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+
+## Learn More
+
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).

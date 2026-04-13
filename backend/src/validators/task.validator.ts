@@ -47,3 +47,22 @@ export const updateTaskSchema = Joi.object({
 }).min(1).messages({
   'object.min': 'At least one field must be provided for update'
 });
+
+export const getTasksQuerySchema = Joi.object({
+  sortByDueDate: Joi.boolean().truthy('true').falsy('false').optional(),
+  status: Joi.string().valid(...Object.values(TaskStatus)).optional().messages({
+    'any.only': `Status must be one of: ${Object.values(TaskStatus).join(', ')}`
+  }),
+  priority: Joi.string().valid(...Object.values(TaskPriority)).optional().messages({
+    'any.only': `Priority must be one of: ${Object.values(TaskPriority).join(', ')}`
+  }),
+  dueDateFrom: Joi.date().iso().optional().messages({
+    'date.base': 'dueDateFrom must be a valid date',
+    'date.format': 'dueDateFrom must be in ISO format'
+  }),
+  dueDateTo: Joi.date().iso().min(Joi.ref('dueDateFrom')).optional().messages({
+    'date.base': 'dueDateTo must be a valid date',
+    'date.format': 'dueDateTo must be in ISO format',
+    'date.min': 'dueDateTo must be greater than or equal to dueDateFrom'
+  })
+});

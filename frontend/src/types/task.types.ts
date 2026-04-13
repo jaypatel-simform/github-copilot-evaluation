@@ -16,9 +16,9 @@ export interface Task {
   description: string;
   status: TaskStatus;
   priority: TaskPriority;
-  dueDate: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  dueDate: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateTaskDto {
@@ -26,7 +26,7 @@ export interface CreateTaskDto {
   description: string;
   status?: TaskStatus;
   priority?: TaskPriority;
-  dueDate?: Date;
+  dueDate?: string;
 }
 
 export interface UpdateTaskDto {
@@ -34,12 +34,20 @@ export interface UpdateTaskDto {
   description?: string;
   status?: TaskStatus;
   priority?: TaskPriority;
-  dueDate?: Date;
+  dueDate?: string;
 }
 
-export interface TaskFilterDto {
-  status?: TaskStatus;
-  priority?: TaskPriority;
-  dueDateFrom?: Date;
-  dueDateTo?: Date;
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  count?: number;
+  message?: string;
+  error?: {
+    message: string;
+    statusCode: number;
+    details?: Array<{
+      field: string;
+      message: string;
+    }>;
+  };
 }
