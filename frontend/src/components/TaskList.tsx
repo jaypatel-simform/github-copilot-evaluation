@@ -16,6 +16,7 @@ const TaskList: React.FC = () => {
 
   useEffect(() => {
     loadTasks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortByDueDate]);
 
   const loadTasks = async () => {
