@@ -65,7 +65,12 @@ export const validateQuery = (schema: Schema) => {
       return;
     }
 
-    req.query = value;
+    Object.defineProperty(req, 'query', {
+      value,
+      writable: true,
+      configurable: true,
+      enumerable: true
+    });
     next();
   };
 };

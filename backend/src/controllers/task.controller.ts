@@ -28,20 +28,26 @@ export const createTask = (req: Request, res: Response, next: NextFunction): voi
 
 export const getAllTasks = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    const sortByDueDate = req.query.sortByDueDate === 'true' || (req.query.sortByDueDate as unknown) === true;
+    const validatedQuery = req.query as Partial<TaskFilterDto> & {
+      sortByDueDate?: boolean;
+      status?: TaskStatus;
+      priority?: TaskPriority;
+    };
+
+    const sortByDueDate = validatedQuery.sortByDueDate ?? false;
 
     const filters: TaskFilterDto = {};
-    if (req.query.status) {
-      filters.status = req.query.status as TaskStatus;
+    if (validatedQuery.status) {
+      filters.status = validatedQuery.status;
     }
-    if (req.query.priority) {
-      filters.priority = req.query.priority as TaskPriority;
+    if (validatedQuery.priority) {
+      filters.priority = validatedQuery.priority;
     }
-    if (req.query.dueDateFrom) {
-      filters.dueDateFrom = new Date(req.query.dueDateFrom as string);
+    if (validatedQuery.dueDateFrom) {
+      filters.dueDateFrom = validatedQuery.dueDateFrom;
     }
-    if (req.query.dueDateTo) {
-      filters.dueDateTo = new Date(req.query.dueDateTo as string);
+    if (validatedQuery.dueDateTo) {
+      filters.dueDateTo = validatedQuery.dueDateTo;
     }
     
     logger.info('Fetching all tasks', { sortByDueDate, filters });
