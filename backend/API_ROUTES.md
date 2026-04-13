@@ -461,8 +461,8 @@ DELETE /tasks/550e8400-e29b-41d4-a716-446655440000
 8. **Priority Automation**: HIGH priority tasks automatically get a due date of 7 days if not specified
 9. **Sorting**: Use `?sortByDueDate=true` query parameter to get tasks sorted by due date
 10. **Filtering**: Use `?status=TODO`, `?priority=HIGH`, `?dueDateFrom=<ISO date>`, or `?dueDateTo=<ISO date>` to filter tasks. Multiple filters can be combined.
-10. **Due Date Management**: Tasks can have custom due dates, or they can be auto-calculated based on priority
-11. **Completed Tasks**: Once a task is marked as `COMPLETED`, it becomes immutable and cannot be modified
+11. **Due Date Management**: Tasks can have custom due dates, or they can be auto-calculated based on priority
+12. **Completed Tasks**: Once a task is marked as `COMPLETED`, it becomes immutable and cannot be modified
 
 ---
 
