@@ -1,0 +1,3 @@
+{"timestamp":"2026-04-23T03:49:15.000Z","sessionId":"session-001","event":"preToolUse","toolName":"bash","toolArguments":{"command":"mkdir -p .github/hooks","description":"Create .github/hooks directory"},"user":"copilot-agent","allowed":true}
+{"timestamp":"2026-04-23T03:49:20.000Z","sessionId":"session-001","event":"preToolUse","toolName":"view","toolArguments":{"path":"/home/runner/work/github-copilot-evaluation/github-copilot-evaluation"},"user":"copilot-agent","allowed":true}
+{"timestamp":"2026-04-23T03:49:25.000Z","sessionId":"session-001","event":"preToolUse","toolName":"create","toolArguments":{"path":".github/hooks/security.json","file_text":"[REDACTED]"},"user":"copilot-agent","allowed":true}
