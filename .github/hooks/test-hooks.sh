@@ -3,6 +3,12 @@
 echo "=== Testing GitHub Copilot Agent Hooks Configuration ==="
 echo ""
 
+# Check if python3 is available
+if ! command -v python3 &> /dev/null; then
+    echo "✗ python3 is required but not found. Please install Python 3."
+    exit 1
+fi
+
 # Check if security.json exists
 if [ -f ".github/hooks/security.json" ]; then
     echo "✓ security.json exists"
@@ -27,17 +33,17 @@ else
     exit 1
 fi
 
-# Check if example log files exist
-if [ -f ".github/logs/session.log" ]; then
-    echo "✓ session.log exists"
+# Check if sample log files exist
+if [ -f ".github/logs/session.sample.log" ]; then
+    echo "✓ session.sample.log exists"
 else
-    echo "✗ session.log not found"
+    echo "✗ session.sample.log not found"
 fi
 
-if [ -f ".github/logs/tool-usage.log" ]; then
-    echo "✓ tool-usage.log exists"
+if [ -f ".github/logs/tool-usage.sample.log" ]; then
+    echo "✓ tool-usage.sample.log exists"
 else
-    echo "✗ tool-usage.log not found"
+    echo "✗ tool-usage.sample.log not found"
 fi
 
 # Display hook configuration summary
@@ -45,21 +51,25 @@ echo ""
 echo "=== Hook Configuration Summary ==="
 echo ""
 echo "sessionStart hook:"
-python3 -c "import json; data=json.load(open('.github/hooks/security.json')); hook=data['hooks']['sessionStart']; print(f\"  Enabled: {hook['enabled']}\n  Description: {hook['description']}\n  Log File: {hook['logFile']}\")"
+python3 -c "import json; data=json.load(open('.github/hooks/security.json')); hook=data['hooks']['sessionStart']; print(f\"  Enabled: {hook['enabled']}\n  Description: {hook['description']}\n  Log File: {hook['logFile']}\n  Log Format: {hook['logFormat']}\")"
 
 echo ""
 echo "preToolUse hook:"
-python3 -c "import json; data=json.load(open('.github/hooks/security.json')); hook=data['hooks']['preToolUse']; print(f\"  Enabled: {hook['enabled']}\n  Description: {hook['description']}\n  Log File: {hook['logFile']}\n  Allowed Tools: {len(hook['allowedTools'])}\")"
+python3 -c "import json; data=json.load(open('.github/hooks/security.json')); hook=data['hooks']['preToolUse']; print(f\"  Enabled: {hook['enabled']}\n  Description: {hook['description']}\n  Log File: {hook['logFile']}\n  Log Format: {hook['logFormat']}\n  Allowed Tools: {len(hook['allowedTools'])}\")"
 
 echo ""
-echo "=== Sample Log Entries ==="
+echo "=== Sample Log Entries (JSONL Format) ==="
 echo ""
-echo "Latest session.log entry:"
-tail -n 1 .github/logs/session.log | python3 -m json.tool 2>/dev/null || tail -n 1 .github/logs/session.log
+if [ -f ".github/logs/session.sample.log" ]; then
+    echo "Latest session.sample.log entry:"
+    tail -n 1 .github/logs/session.sample.log | python3 -m json.tool 2>/dev/null || tail -n 1 .github/logs/session.sample.log
+fi
 
 echo ""
-echo "Latest tool-usage.log entry:"
-tail -n 1 .github/logs/tool-usage.log | python3 -m json.tool 2>/dev/null || tail -n 1 .github/logs/tool-usage.log
+if [ -f ".github/logs/tool-usage.sample.log" ]; then
+    echo "Latest tool-usage.sample.log entry:"
+    tail -n 1 .github/logs/tool-usage.sample.log | python3 -m json.tool 2>/dev/null || tail -n 1 .github/logs/tool-usage.sample.log
+fi
 
 echo ""
 echo "=== All Tests Passed ✓ ==="

@@ -5,7 +5,7 @@
       "description": "Records when agent sessions begin",
       "action": "log",
       "logFile": ".github/logs/session.log",
-      "logFormat": "json",
+      "logFormat": "jsonl",
       "captureData": {
         "timestamp": true,
         "sessionId": true,
@@ -18,7 +18,7 @@
       "description": "Logs all tool executions before they are invoked",
       "action": "log",
       "logFile": ".github/logs/tool-usage.log",
-      "logFormat": "json",
+      "logFormat": "jsonl",
       "captureData": {
         "timestamp": true,
         "toolName": true,

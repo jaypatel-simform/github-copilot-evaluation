@@ -15,8 +15,10 @@ This repository now has GitHub Copilot agent hooks configured for security loggi
 │   ├── test-hooks.sh       # Automated test script
 │   └── QUICK_START.md      # This file
 └── logs/
-    ├── session.log         # Session start logs
-    ├── tool-usage.log      # Tool execution logs
+    ├── session.log         # Session start logs (JSONL format)
+    ├── tool-usage.log      # Tool execution logs (JSONL format)
+    ├── session.sample.log  # Sample session log (committed)
+    ├── tool-usage.sample.log # Sample tool usage log (committed)
     └── .gitignore          # Log management
 ```
 
@@ -29,11 +31,15 @@ bash .github/hooks/test-hooks.sh
 
 ### View Logs
 ```bash
-# Session logs
-cat .github/logs/session.log
+# Sample session logs (JSONL format)
+cat .github/logs/session.sample.log
 
-# Tool usage logs
-cat .github/logs/tool-usage.log
+# Sample tool usage logs (JSONL format)
+cat .github/logs/tool-usage.sample.log
+
+# Actual logs (if they exist)
+cat .github/logs/session.log 2>/dev/null || echo "No active logs yet"
+cat .github/logs/tool-usage.log 2>/dev/null || echo "No active logs yet"
 ```
 
 ### Monitor in Real-Time
@@ -47,14 +53,17 @@ tail -f .github/logs/tool-usage.log
 
 ### Analyze Logs
 ```bash
-# Count session starts
-grep -c "sessionStart" .github/logs/session.log
+# Count session starts (JSONL format)
+grep -c "sessionStart" .github/logs/session.log 2>/dev/null || echo "0"
 
-# Count tool executions
-grep -c "preToolUse" .github/logs/tool-usage.log
+# Count tool executions (JSONL format)
+grep -c "preToolUse" .github/logs/tool-usage.log 2>/dev/null || echo "0"
 
 # List all tools used
-grep '"toolName"' .github/logs/tool-usage.log | sort | uniq
+grep -o '"toolName":"[^"]*"' .github/logs/tool-usage.log 2>/dev/null | sort | uniq
+
+# Pretty-print a log entry
+head -n 1 .github/logs/session.sample.log | python3 -m json.tool
 ```
 
 ## 🔧 Configuration Overview
@@ -62,11 +71,13 @@ grep '"toolName"' .github/logs/tool-usage.log | sort | uniq
 ### sessionStart Hook
 - **Purpose**: Logs when agent sessions begin
 - **Log File**: `.github/logs/session.log`
+- **Log Format**: JSONL (JSON Lines) - one JSON object per line
 - **Captures**: timestamp, sessionId, user, environment
 
 ### preToolUse Hook
 - **Purpose**: Logs all tool executions
 - **Log File**: `.github/logs/tool-usage.log`
+- **Log Format**: JSONL (JSON Lines) - one JSON object per line
 - **Captures**: timestamp, toolName, toolArguments, sessionId, user
 - **Allowed Tools**: bash, view, edit, create, grep, glob, task, web_search, github-mcp-server-*
 
@@ -75,7 +86,7 @@ grep '"toolName"' .github/logs/tool-usage.log | sort | uniq
 1. ✅ Sensitive data redaction (passwords, API keys, secrets, tokens)
 2. ✅ Tool whitelisting
 3. ✅ Complete audit trail
-4. ✅ JSON format for easy parsing
+4. ✅ JSONL (JSON Lines) format for easy line-by-line parsing
 5. ✅ Session tracking
 
 ## 📊 Testing
@@ -90,8 +101,8 @@ $ bash .github/hooks/test-hooks.sh
 ✓ security.json exists
 ✓ security.json is valid JSON
 ✓ logs directory exists
-✓ session.log exists
-✓ tool-usage.log exists
+✓ session.sample.log exists
+✓ tool-usage.sample.log exists
 
 === All Tests Passed ✓ ===
 ```

@@ -1,7 +1,6 @@
-# Ignore all log files except example logs
+# Ignore all real log files; only keep clearly labeled sample logs
 *.log
-!session.log
-!tool-usage.log
+!*.sample.log
 
 # Keep the directory structure
 !.gitignore

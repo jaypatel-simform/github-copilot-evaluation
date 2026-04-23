@@ -36,11 +36,15 @@ python3 -m json.tool .github/hooks/security.json
 # List log directory contents
 ls -la .github/logs/
 
-# View session log
-cat .github/logs/session.log
+# View sample session log (JSONL format)
+cat .github/logs/session.sample.log
 
-# View tool usage log
-cat .github/logs/tool-usage.log
+# View sample tool usage log (JSONL format)
+cat .github/logs/tool-usage.sample.log
+
+# View actual logs if they exist
+cat .github/logs/session.log 2>/dev/null || echo "No active session log yet"
+cat .github/logs/tool-usage.log 2>/dev/null || echo "No active tool usage log yet"
 ```
 
 ### 3. Test with Copilot Coding Agent
@@ -68,18 +72,26 @@ To test the hooks in action:
 
 ### 4. Parse and Analyze Logs
 
+JSONL (JSON Lines) logs can be parsed line-by-line:
+
 ```bash
 # Count session starts
-grep -c '"event": "sessionStart"' .github/logs/session.log
+grep -c '"event":"sessionStart"' .github/logs/session.log
 
 # Count tool executions
-grep -c '"event": "preToolUse"' .github/logs/tool-usage.log
+grep -c '"event":"preToolUse"' .github/logs/tool-usage.log
 
 # List all tools used
-grep '"toolName"' .github/logs/tool-usage.log | sort | uniq
+grep -o '"toolName":"[^"]*"' .github/logs/tool-usage.log | sort | uniq
 
-# Format a log entry for easier reading
-tail -n 1 .github/logs/session.log | python3 -m json.tool
+# Pretty-print each log entry
+while IFS= read -r line; do
+  echo "$line" | python3 -m json.tool
+  echo "---"
+done < .github/logs/session.sample.log
+
+# Using jq (if available) for advanced queries
+cat .github/logs/tool-usage.sample.log | jq '.toolName'
 ```
 
 ## Expected Behavior
@@ -183,7 +195,7 @@ The hooks are working correctly if:
 - ✓ sessionStart hook logs when agent sessions begin
 - ✓ preToolUse hook logs all tool executions
 - ✓ Sensitive data is properly redacted
-- ✓ Log files are in JSON format
+- ✓ Log files are in JSONL (JSON Lines) format - one JSON object per line
 - ✓ Timestamps are in ISO 8601 format
 - ✓ Session IDs are unique and consistent
 - ✓ Tool arguments are captured (with redaction)
