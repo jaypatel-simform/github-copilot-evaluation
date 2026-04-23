@@ -1,0 +1,6 @@
+# Ignore all real log files; only keep clearly labeled sample logs
+*.log
+!*.sample.log
+
+# Keep the directory structure
+!.gitignore

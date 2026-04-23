@@ -1,0 +1,67 @@
+{
+  "hooks": {
+    "sessionStart": {
+      "enabled": true,
+      "description": "Records when agent sessions begin",
+      "action": "log",
+      "logFile": ".github/logs/session.log",
+      "logFormat": "jsonl",
+      "captureData": {
+        "timestamp": true,
+        "sessionId": true,
+        "user": true,
+        "environment": true
+      }
+    },
+    "preToolUse": {
+      "enabled": true,
+      "description": "Logs all tool executions before they are invoked",
+      "action": "log",
+      "logFile": ".github/logs/tool-usage.log",
+      "logFormat": "jsonl",
+      "captureData": {
+        "timestamp": true,
+        "toolName": true,
+        "toolArguments": true,
+        "sessionId": true,
+        "user": true
+      },
+      "allowedTools": [
+        "bash",
+        "view",
+        "edit",
+        "create",
+        "grep",
+        "glob",
+        "task",
+        "web_search",
+        "github-mcp-server-*"
+      ],
+      "denyTools": []
+    }
+  },
+  "logging": {
+    "enabled": true,
+    "logDirectory": ".github/logs",
+    "maxLogSize": "10MB",
+    "rotationPolicy": "daily",
+    "retentionDays": 30
+  },
+  "security": {
+    "auditEnabled": true,
+    "sensitiveDataFiltering": true,
+    "redactPatterns": [
+      "password",
+      "api_key",
+      "secret",
+      "token",
+      "credential"
+    ]
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2026-04-23",
+    "description": "Security configuration for GitHub Copilot agent hooks",
+    "repository": "jaypatel-simform/github-copilot-evaluation"
+  }
+}
