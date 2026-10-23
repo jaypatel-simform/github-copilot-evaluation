@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Task, CreateTaskDto, TaskStatus, TaskPriority } from '../types/task.types';
+import { PRIORITY_OPTIONS } from '../constants/priority';
 import './TaskForm.css';
 
 interface TaskFormProps {
@@ -140,9 +141,11 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel, isLoading
             onChange={handleChange}
             disabled={isLoading}
           >
-            <option value={TaskPriority.LOW}>Low</option>
-            <option value={TaskPriority.MID}>Medium</option>
-            <option value={TaskPriority.HIGH}>High</option>
+            {PRIORITY_OPTIONS.map(({ value, label }) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
           </select>
         </div>
       </div>

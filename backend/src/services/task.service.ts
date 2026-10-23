@@ -1,4 +1,4 @@
-import { Task, CreateTaskDto, UpdateTaskDto, TaskFilterDto, TaskStatus, TaskPriority } from '../models/task.model';
+import { Task, CreateTaskDto, UpdateTaskDto, TaskFilterDto, TaskStatus, TaskPriority, isHighUrgencyPriority } from '../models/task.model';
 import { randomUUID } from 'node:crypto';
 import { logger } from '../utils/logger';
 import { ForbiddenError } from '../utils/errors';
@@ -8,13 +8,14 @@ class TaskStore {
 
   /**
    * Calculate due date based on priority
-   * If priority is HIGH, set due date to 7 days from now
+   * If priority is a high-urgency one ("Very high" or HIGH), set due date to 7 days from now
    */
   private calculateDueDate(priority: TaskPriority, providedDueDate?: Date): Date {
-    if (priority === TaskPriority.HIGH && !providedDueDate) {
+    if (isHighUrgencyPriority(priority) && !providedDueDate) {
       const dueDate = new Date();
       dueDate.setDate(dueDate.getDate() + 7);
-      logger.debug('Auto-calculated due date for HIGH priority task', { 
+      logger.debug('Auto-calculated due date for high-urgency priority task', { 
+        priority,
         dueDate: dueDate.toISOString() 
       });
       return dueDate;
@@ -132,12 +133,17 @@ class TaskStore {
         throw new ForbiddenError('Cannot modify a task that is already completed');
       }
 
-      // Recalculate due date if priority is being changed to HIGH
+      // Recalculate due date if priority is being changed to a high-urgency priority ("Very high" or HIGH)
       let dueDate = task.dueDate;
-      if (dto.priority === TaskPriority.HIGH && task.priority !== TaskPriority.HIGH) {
-        dueDate = this.calculateDueDate(TaskPriority.HIGH, dto.dueDate);
-        logger.debug('Due date recalculated for priority change to HIGH', {
+      if (
+        dto.priority !== undefined &&
+        dto.priority !== task.priority &&
+        isHighUrgencyPriority(dto.priority)
+      ) {
+        dueDate = this.calculateDueDate(dto.priority, dto.dueDate);
+        logger.debug('Due date recalculated for priority change to a high-urgency priority', {
           taskId: id,
+          priority: dto.priority,
           newDueDate: dueDate.toISOString()
         });
       } else if (dto.dueDate) {

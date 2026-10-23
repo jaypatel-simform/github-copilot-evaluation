@@ -19,9 +19,12 @@ http://localhost:3000/api
 - `COMPLETED`
 
 ## Task Priority Enum
-- `HIGH` - Due date automatically set to 7 days from creation
+- `Very high` - Most urgent; due date automatically set to 7 days from creation/update (ranks above `HIGH`)
+- `HIGH` - Due date automatically set to 7 days from creation/update
 - `MID` - Default priority
 - `LOW`
+
+> Priorities are ordered `Very high` > `HIGH` > `MID` > `LOW`. All values are stored and returned exactly as shown (including the space and lower-case letters of `Very high`).
 
 ---
 
@@ -44,8 +47,8 @@ Content-Type: application/json
   "title": "string (required, min: 1, max: 200)",
   "description": "string (required, max: 1000)",
   "status": "string (optional, one of: TODO, IN_PROGRESS, COMPLETED)",
-  "priority": "string (optional, one of: HIGH, MID, LOW, default: MID)",
-  "dueDate": "string (optional, ISO date format, auto-set for HIGH priority)"
+  "priority": "string (optional, one of: Very high, HIGH, MID, LOW, default: MID)",
+  "dueDate": "string (optional, ISO date format, auto-set for Very high and HIGH priority)"
 }
 ```
 
@@ -55,11 +58,11 @@ Content-Type: application/json
   "title": "Implement user authentication",
   "description": "Add JWT-based authentication to the application",
   "status": "TODO",
-  "priority": "HIGH"
+  "priority": "Very high"
 }
 ```
 
-**Note:** When `priority` is set to `HIGH` and `dueDate` is not provided, the system automatically sets the due date to 7 days from the creation date.
+**Note:** When `priority` is set to `Very high` or `HIGH` and `dueDate` is not provided, the system automatically sets the due date to 7 days from the creation date.
 
 #### Success Response (201)
 ```json
@@ -70,7 +73,7 @@ Content-Type: application/json
     "title": "Implement user authentication",
     "description": "Add JWT-based authentication to the application",
     "status": "TODO",
-    "priority": "HIGH",
+    "priority": "Very high",
     "dueDate": "2026-02-27T10:30:00.000Z",
     "createdAt": "2026-02-20T10:30:00.000Z",
     "updatedAt": "2026-02-20T10:30:00.000Z"
@@ -105,7 +108,7 @@ Retrieves all tasks from the system. Supports filtering and sorting.
 #### Query Parameters
 - `sortByDueDate` (optional) - Set to `true` to sort tasks by due date in ascending order
 - `status` (optional) - Filter tasks by status. One of: `TODO`, `IN_PROGRESS`, `COMPLETED`
-- `priority` (optional) - Filter tasks by priority. One of: `HIGH`, `MID`, `LOW`
+- `priority` (optional) - Filter tasks by priority. One of: `Very high`, `HIGH`, `MID`, `LOW`
 - `dueDateFrom` (optional) - Filter tasks with due date on or after this date (ISO format)
 - `dueDateTo` (optional) - Filter tasks with due date on or before this date (ISO format). Must be greater than or equal to `dueDateFrom` when both are provided.
 
@@ -121,10 +124,13 @@ GET /tasks
 GET /tasks?sortByDueDate=true
 GET /tasks?status=TODO
 GET /tasks?priority=HIGH
+GET /tasks?priority=Very%20high
 GET /tasks?status=IN_PROGRESS&priority=MID
 GET /tasks?dueDateFrom=2026-01-01T00:00:00.000Z&dueDateTo=2026-06-30T23:59:59.000Z
 GET /tasks?status=TODO&sortByDueDate=true&dueDateFrom=2026-01-01T00:00:00.000Z
 ```
+
+**Note:** The `Very high` value contains a space, so it must be URL-encoded in the query string (`priority=Very%20high`).
 
 #### Success Response (200)
 ```json
@@ -230,6 +236,8 @@ GET /tasks/550e8400-e29b-41d4-a716-446655440000
 
 **PUT** `/tasks/:id`
 
+**PATCH** `/tasks/:id` is supported as an alias of `PUT`: same body, same validation, same business rules (both accept partial updates).
+
 Updates an existing task. At least one field must be provided.
 
 #### URL Parameters
@@ -246,7 +254,7 @@ Content-Type: application/json
   "title": "string (optional, min: 1, max: 200)",
   "description": "string (optional, max: 1000)",
   "status": "string (optional, one of: TODO, IN_PROGRESS, COMPLETED)",
-  "priority": "string (optional, one of: HIGH, MID, LOW)",
+  "priority": "string (optional, one of: Very high, HIGH, MID, LOW)",
   "dueDate": "string (optional, ISO date format)"
 }
 ```
@@ -255,12 +263,12 @@ Content-Type: application/json
 ```json
 {
   "status": "IN_PROGRESS",
-  "priority": "HIGH",
+  "priority": "Very high",
   "description": "Add JWT-based authentication to the application. Working on token generation."
 }
 ```
 
-**Note:** When updating `priority` to `HIGH` from a different priority level, and no `dueDate` is provided, the system automatically recalculates the due date to 7 days from the update time.
+**Note:** When updating `priority` to `Very high` or `HIGH` from a different priority level, and no `dueDate` is provided, the system automatically recalculates the due date to 7 days from the update time. An explicitly supplied `dueDate` is always preserved.
 
 #### Success Response (200)
 ```json
@@ -271,7 +279,7 @@ Content-Type: application/json
     "title": "Implement user authentication",
     "description": "Add JWT-based authentication to the application. Working on token generation.",
     "status": "IN_PROGRESS",
-    "priority": "HIGH",
+    "priority": "Very high",
     "dueDate": "2026-02-27T12:00:00.000Z",
     "createdAt": "2026-02-20T10:30:00.000Z",
     "updatedAt": "2026-02-20T12:00:00.000Z"
@@ -419,14 +427,15 @@ DELETE /tasks/550e8400-e29b-41d4-a716-446655440000
 
 ### Priority
 - **Optional** for both create and update
-- Must be one of: `HIGH`, `MID`, `LOW`
+- Must be one of: `Very high`, `HIGH`, `MID`, `LOW`
 - Defaults to `MID` if not provided during creation
-- When set to `HIGH` without a specified `dueDate`, automatically sets due date to 7 days from creation/update
+- Urgency order: `Very high` > `HIGH` > `MID` > `LOW`
+- When set to `Very high` or `HIGH` without a specified `dueDate`, automatically sets due date to 7 days from creation/update
 
 ### Due Date
 - **Optional** for both create and update
 - Must be a valid ISO date format
-- When `priority` is `HIGH` and `dueDate` is not provided, automatically set to 7 days from now
+- When `priority` is `Very high` or `HIGH` and `dueDate` is not provided, automatically set to 7 days from now
 - For other priorities, defaults to 30 days from creation if not provided
 
 ### UUID (for :id parameter)
@@ -458,9 +467,9 @@ DELETE /tasks/550e8400-e29b-41d4-a716-446655440000
 5. **Error Handling**: Always check the `success` field in responses
 6. **Validation**: Refer to the validation rules section for field constraints
 7. **Status Updates**: When updating a task, you can change the status without providing other fields
-8. **Priority Automation**: HIGH priority tasks automatically get a due date of 7 days if not specified
+8. **Priority Automation**: `Very high` and `HIGH` priority tasks automatically get a due date of 7 days if not specified
 9. **Sorting**: Use `?sortByDueDate=true` query parameter to get tasks sorted by due date
-10. **Filtering**: Use `?status=TODO`, `?priority=HIGH`, `?dueDateFrom=<ISO date>`, or `?dueDateTo=<ISO date>` to filter tasks. Multiple filters can be combined.
+10. **Filtering**: Use `?status=TODO`, `?priority=HIGH` (or `?priority=Very%20high`, `?priority=MID`, `?priority=LOW`), `?dueDateFrom=<ISO date>`, or `?dueDateTo=<ISO date>` to filter tasks. Multiple filters can be combined.
 11. **Due Date Management**: Tasks can have custom due dates, or they can be auto-calculated based on priority
 12. **Completed Tasks**: Once a task is marked as `COMPLETED`, it becomes immutable and cannot be modified
 
@@ -487,7 +496,7 @@ const createTask = async (taskData) => {
 const getAllTasks = async (options: {
   sortByDueDate?: boolean;
   status?: 'TODO' | 'IN_PROGRESS' | 'COMPLETED';
-  priority?: 'HIGH' | 'MID' | 'LOW';
+  priority?: 'Very high' | 'HIGH' | 'MID' | 'LOW';
   dueDateFrom?: string;
   dueDateTo?: string;
 } = {}) => {
