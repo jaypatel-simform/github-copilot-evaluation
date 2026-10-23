@@ -55,6 +55,11 @@
   white-space: nowrap;
 }
 
+.badge.priority.priority-very-high {
+  background: #ffcdd2;
+  color: #b71c1c;
+}
+
 .badge.priority.priority-high {
   background: #ffebee;
   color: #c62828;
