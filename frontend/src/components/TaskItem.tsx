@@ -1,5 +1,6 @@
 import React from 'react';
 import { Task, TaskStatus, TaskPriority } from '../types/task.types';
+import { PRIORITY_BADGE_CLASS } from '../constants/priority';
 import './TaskItem.css';
 
 interface TaskItemProps {
@@ -32,18 +33,7 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit, onDelete, onStatusCha
     }
   };
 
-  const getPriorityClass = (priority: TaskPriority) => {
-    switch (priority) {
-      case TaskPriority.HIGH:
-        return 'priority-high';
-      case TaskPriority.MID:
-        return 'priority-mid';
-      case TaskPriority.LOW:
-        return 'priority-low';
-      default:
-        return '';
-    }
-  };
+  const getPriorityClass = (priority: TaskPriority) => PRIORITY_BADGE_CLASS[priority] ?? '';
 
   const handleDelete = () => {
     if (window.confirm(`Are you sure you want to delete "${task.title}"?`)) {

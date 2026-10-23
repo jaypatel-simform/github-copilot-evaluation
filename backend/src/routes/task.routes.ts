@@ -24,6 +24,9 @@ router.get('/tasks/:id', validateUUID('id'), getTaskById);
 // Update a task
 router.put('/tasks/:id', validateUUID('id'), validate(updateTaskSchema), updateTask);
 
+// Update a task (PATCH alias of PUT - same validation and business rules)
+router.patch('/tasks/:id', validateUUID('id'), validate(updateTaskSchema), updateTask);
+
 // Delete a task
 router.delete('/tasks/:id', validateUUID('id'), deleteTask);
 

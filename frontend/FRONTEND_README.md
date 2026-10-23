@@ -6,7 +6,7 @@ A modern React-based frontend application for managing tasks, built with TypeScr
 
 - ✅ Create, Read, Update, and Delete tasks
 - ✅ Task status management (TODO, IN_PROGRESS, COMPLETED)
-- ✅ Priority levels (HIGH, MID, LOW)
+- ✅ Priority levels (Very high, HIGH, MID, LOW) — `Very high` and `HIGH` get a due date 7 days out when none is supplied
 - ✅ Due date management
 - ✅ Sort tasks by due date
 - ✅ Responsive design
@@ -54,6 +54,30 @@ http://localhost:3001
 
 The app will automatically reload if you make changes to the code.
 
+### Frontend-only mode (mock API)
+
+If you are doing the frontend-only track there is no backend: the `mock-api/` folder ships a
+[json-server](https://github.com/typicode/json-server) mock of the task API backed by `mock-api/db.json`.
+
+1. Start the mock API. Its default port is 3001, which the React dev server also uses, so give it another port:
+```bash
+cd mock-api
+npm install
+npx json-server --watch db.json --port 3002
+```
+
+2. Start the frontend pointed at the mock API (json-server serves the tasks under `/tasks` at the
+   root, so there is **no** `/api` prefix):
+```bash
+cd frontend
+REACT_APP_API_URL=http://localhost:3002 npm start
+```
+
+`mock-api/db.json` contains sample tasks covering all four priorities, including a `Very high` one,
+so the new priority and its badge are visible straight away. The mock API stores whatever priority
+string it is sent; the automatic 7-day due date for `Very high`/`HIGH` is a backend rule and is not
+applied by json-server.
+
 ## Available Scripts
 
 ### `npm start`
@@ -79,6 +103,8 @@ frontend/
 │   │   └── TaskItem.css
 │   ├── services/
 │   │   └── taskService.ts      # API integration service
+│   ├── constants/
+│   │   └── priority.ts         # Priority order, labels and badge classes
 │   ├── types/
 │   │   └── task.types.ts       # TypeScript type definitions
 │   ├── App.tsx                 # Main app component
@@ -119,7 +145,8 @@ The frontend connects to the backend API endpoints:
 
 ### Task Item
 - Color-coded by status
-- Priority badges
+- Priority badges: `VERY HIGH` uses a solid dark-red badge, visually stronger than the pale `HIGH` badge, which
+  is stronger than `MEDIUM` and `LOW`
 - Quick status change buttons
 - Edit and delete actions
 - Completed tasks are immutable (edit disabled)

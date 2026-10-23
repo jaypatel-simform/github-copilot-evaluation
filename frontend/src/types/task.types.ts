@@ -4,7 +4,12 @@ export enum TaskStatus {
   COMPLETED = 'COMPLETED'
 }
 
+/**
+ * Task priorities, declared in descending order of urgency:
+ * "Very high" > HIGH > MID > LOW.
+ */
 export enum TaskPriority {
+  VERY_HIGH = 'Very high',
   HIGH = 'HIGH',
   MID = 'MID',
   LOW = 'LOW'

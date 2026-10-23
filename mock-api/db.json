@@ -1,7 +1,44 @@
 {
   "tasks": [
     {
-      "id": "1"
+      "id": "1",
+      "title": "Ship release candidate",
+      "description": "Cut the RC branch, run the regression suite and publish the release notes.",
+      "status": "IN_PROGRESS",
+      "priority": "Very high",
+      "dueDate": "2026-02-20T17:00:00.000Z",
+      "createdAt": "2026-02-15T09:00:00.000Z",
+      "updatedAt": "2026-02-18T10:30:00.000Z"
+    },
+    {
+      "id": "2",
+      "title": "Implement user authentication",
+      "description": "Add JWT-based authentication to the application.",
+      "status": "TODO",
+      "priority": "HIGH",
+      "dueDate": "2026-02-25T12:00:00.000Z",
+      "createdAt": "2026-02-18T10:00:00.000Z",
+      "updatedAt": "2026-02-18T10:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "title": "Setup database",
+      "description": "Configure PostgreSQL database and the local development connection.",
+      "status": "TODO",
+      "priority": "MID",
+      "dueDate": "2026-03-18T11:00:00.000Z",
+      "createdAt": "2026-02-18T11:00:00.000Z",
+      "updatedAt": "2026-02-18T11:00:00.000Z"
+    },
+    {
+      "id": "4",
+      "title": "Write API documentation",
+      "description": "Document the task management endpoints for the frontend team.",
+      "status": "COMPLETED",
+      "priority": "LOW",
+      "dueDate": "2026-02-28T09:00:00.000Z",
+      "createdAt": "2026-02-10T09:00:00.000Z",
+      "updatedAt": "2026-02-17T16:45:00.000Z"
     }
   ]
 }
