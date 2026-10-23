@@ -143,6 +143,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel, isLoading
             <option value={TaskPriority.LOW}>Low</option>
             <option value={TaskPriority.MID}>Medium</option>
             <option value={TaskPriority.HIGH}>High</option>
+            <option value={TaskPriority.VERY_HIGH}>Very High</option>
           </select>
         </div>
       </div>

@@ -34,6 +34,8 @@ const TaskItem: React.FC<TaskItemProps> = ({ task, onEdit, onDelete, onStatusCha
 
   const getPriorityClass = (priority: TaskPriority) => {
     switch (priority) {
+      case TaskPriority.VERY_HIGH:
+        return 'priority-very-high';
       case TaskPriority.HIGH:
         return 'priority-high';
       case TaskPriority.MID:
