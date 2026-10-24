@@ -37,6 +37,15 @@ export interface UpdateTaskDto {
   dueDate?: string;
 }
 
+export interface TaskQueryParams {
+  sortByDueDate?: boolean;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  dueDateFrom?: string;
+  dueDateTo?: string;
+  q?: string;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;

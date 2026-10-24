@@ -49,6 +49,9 @@ export const getAllTasks = (req: Request, res: Response, next: NextFunction): vo
     if (validatedQuery.dueDateTo) {
       filters.dueDateTo = validatedQuery.dueDateTo;
     }
+    if (validatedQuery.q) {
+      filters.q = validatedQuery.q;
+    }
     
     logger.info('Fetching all tasks', { sortByDueDate, filters });
     

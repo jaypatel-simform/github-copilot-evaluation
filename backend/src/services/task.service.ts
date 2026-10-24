@@ -88,6 +88,16 @@ class TaskStore {
         tasks = tasks.filter(task => new Date(task.dueDate).getTime() <= to);
       }
 
+      if (filters.q) {
+        const needle = filters.q.trim().toLowerCase();
+        if (needle) {
+          tasks = tasks.filter(task =>
+            task.title.toLowerCase().includes(needle) ||
+            task.description.toLowerCase().includes(needle)
+          );
+        }
+      }
+
       if (sortByDueDate) {
         tasks.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
         logger.debug('Tasks sorted by due date', { count: tasks.length });

@@ -42,4 +42,5 @@ export interface TaskFilterDto {
   priority?: TaskPriority;
   dueDateFrom?: Date;
   dueDateTo?: Date;
+  q?: string;
 }
