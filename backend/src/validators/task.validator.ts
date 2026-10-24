@@ -64,5 +64,9 @@ export const getTasksQuerySchema = Joi.object({
     'date.base': 'dueDateTo must be a valid date',
     'date.format': 'dueDateTo must be in ISO format',
     'date.min': 'dueDateTo must be greater than or equal to dueDateFrom'
+  }),
+  q: Joi.string().trim().max(100).allow('').optional().messages({
+    'string.base': 'q must be a string',
+    'string.max': 'q must not exceed 100 characters'
   })
 });

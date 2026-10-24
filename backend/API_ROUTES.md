@@ -108,6 +108,7 @@ Retrieves all tasks from the system. Supports filtering and sorting.
 - `priority` (optional) - Filter tasks by priority. One of: `HIGH`, `MID`, `LOW`
 - `dueDateFrom` (optional) - Filter tasks with due date on or after this date (ISO format)
 - `dueDateTo` (optional) - Filter tasks with due date on or before this date (ISO format). Must be greater than or equal to `dueDateFrom` when both are provided.
+- `q` (optional) - Search text. Trimmed, maximum 100 characters. Keeps only tasks whose `title` or `description` contains the text (case-insensitive substring match). Combined (AND) with all other filters and with `sortByDueDate`. A blank value is ignored.
 
 #### Request Headers
 None required
@@ -124,6 +125,8 @@ GET /tasks?priority=HIGH
 GET /tasks?status=IN_PROGRESS&priority=MID
 GET /tasks?dueDateFrom=2026-01-01T00:00:00.000Z&dueDateTo=2026-06-30T23:59:59.000Z
 GET /tasks?status=TODO&sortByDueDate=true&dueDateFrom=2026-01-01T00:00:00.000Z
+GET /tasks?q=foo
+GET /tasks?q=report&status=TODO&sortByDueDate=true
 ```
 
 #### Success Response (200)
@@ -429,6 +432,13 @@ DELETE /tasks/550e8400-e29b-41d4-a716-446655440000
 - When `priority` is `HIGH` and `dueDate` is not provided, automatically set to 7 days from now
 - For other priorities, defaults to 30 days from creation if not provided
 
+### Search Query (`q` query parameter on GET /tasks)
+- **Optional**
+- Must be a single string (repeated `q` parameters are rejected)
+- Automatically trimmed; blank values are ignored
+- Maximum length: 100 characters
+- Case-insensitive substring match against `title` and `description`
+
 ### UUID (for :id parameter)
 - Must be a valid UUID v4 format
 - Example: `550e8400-e29b-41d4-a716-446655440000`
@@ -460,7 +470,7 @@ DELETE /tasks/550e8400-e29b-41d4-a716-446655440000
 7. **Status Updates**: When updating a task, you can change the status without providing other fields
 8. **Priority Automation**: HIGH priority tasks automatically get a due date of 7 days if not specified
 9. **Sorting**: Use `?sortByDueDate=true` query parameter to get tasks sorted by due date
-10. **Filtering**: Use `?status=TODO`, `?priority=HIGH`, `?dueDateFrom=<ISO date>`, or `?dueDateTo=<ISO date>` to filter tasks. Multiple filters can be combined.
+10. **Filtering**: Use `?status=TODO`, `?priority=HIGH`, `?dueDateFrom=<ISO date>`, `?dueDateTo=<ISO date>`, or `?q=<text>` (case-insensitive search in title/description) to filter tasks. Multiple filters can be combined.
 11. **Due Date Management**: Tasks can have custom due dates, or they can be auto-calculated based on priority
 12. **Completed Tasks**: Once a task is marked as `COMPLETED`, it becomes immutable and cannot be modified
 
@@ -490,6 +500,7 @@ const getAllTasks = async (options: {
   priority?: 'HIGH' | 'MID' | 'LOW';
   dueDateFrom?: string;
   dueDateTo?: string;
+  q?: string;
 } = {}) => {
   const params = new URLSearchParams();
   if (options.sortByDueDate) params.set('sortByDueDate', 'true');
@@ -497,6 +508,7 @@ const getAllTasks = async (options: {
   if (options.priority) params.set('priority', options.priority);
   if (options.dueDateFrom) params.set('dueDateFrom', options.dueDateFrom);
   if (options.dueDateTo) params.set('dueDateTo', options.dueDateTo);
+  if (options.q) params.set('q', options.q);
   const query = params.toString();
   const url = query
     ? `http://localhost:3000/api/tasks?${query}`

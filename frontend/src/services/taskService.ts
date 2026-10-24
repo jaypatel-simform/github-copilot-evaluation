@@ -1,4 +1,4 @@
-import { Task, CreateTaskDto, UpdateTaskDto, ApiResponse } from '../types/task.types';
+import { Task, CreateTaskDto, UpdateTaskDto, ApiResponse, TaskQueryParams } from '../types/task.types';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000/api';
 
@@ -13,11 +13,34 @@ class TaskService {
     return data;
   }
 
-  async getAllTasks(sortByDueDate?: boolean): Promise<ApiResponse<Task[]>> {
-    const url = sortByDueDate 
-      ? `${API_BASE_URL}/tasks?sortByDueDate=true`
+  async getAllTasks(params: TaskQueryParams = {}): Promise<ApiResponse<Task[]>> {
+    const searchParams = new URLSearchParams();
+
+    if (params.sortByDueDate) {
+      searchParams.set('sortByDueDate', 'true');
+    }
+    if (params.status) {
+      searchParams.set('status', params.status);
+    }
+    if (params.priority) {
+      searchParams.set('priority', params.priority);
+    }
+    if (params.dueDateFrom) {
+      searchParams.set('dueDateFrom', params.dueDateFrom);
+    }
+    if (params.dueDateTo) {
+      searchParams.set('dueDateTo', params.dueDateTo);
+    }
+    const q = params.q?.trim();
+    if (q) {
+      searchParams.set('q', q);
+    }
+
+    const queryString = searchParams.toString();
+    const url = queryString
+      ? `${API_BASE_URL}/tasks?${queryString}`
       : `${API_BASE_URL}/tasks`;
-    
+
     const response = await fetch(url);
     return this.handleResponse<Task[]>(response);
   }

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Task, CreateTaskDto, UpdateTaskDto, TaskStatus } from '../types/task.types';
+import React, { useState, useEffect, useRef } from 'react';
+import { Task, CreateTaskDto, UpdateTaskDto, TaskStatus, TaskQueryParams } from '../types/task.types';
 import taskService from '../services/taskService';
 import TaskForm from './TaskForm';
 import TaskItem from './TaskItem';
+import TaskFilters, { TaskFilterValues, EMPTY_FILTERS } from './TaskFilters';
 import './TaskList.css';
 
 const TaskList: React.FC = () => {
@@ -14,24 +15,87 @@ const TaskList: React.FC = () => {
   const [sortByDueDate, setSortByDueDate] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
 
+  const [filters, setFilters] = useState<TaskFilterValues>(EMPTY_FILTERS);
+  const requestIdRef = useRef(0);
+
+  const dateRangeError =
+    filters.dueDateFrom && filters.dueDateTo && filters.dueDateFrom > filters.dueDateTo
+      ? '"From" date must be on or before the "To" date'
+      : null;
+
+  const hasActiveFilters = !!(
+    filters.status ||
+    filters.priority ||
+    filters.dueDateFrom ||
+    filters.dueDateTo ||
+    filters.q.trim()
+  );
+
+  // Convert a YYYY-MM-DD value to the start/end of that local day as an ISO string,
+  // so the backend's inclusive range covers the whole selected day(s).
+  const toLocalDayBoundary = (value: string, endOfDay: boolean): string => {
+    const [y, m, d] = value.split('-').map(Number);
+    const date = endOfDay
+      ? new Date(y, m - 1, d, 23, 59, 59, 999)
+      : new Date(y, m - 1, d, 0, 0, 0, 0);
+    return date.toISOString();
+  };
+
+  const buildParams = (): TaskQueryParams => {
+    const params: TaskQueryParams = { sortByDueDate };
+    if (filters.status) params.status = filters.status;
+    if (filters.priority) params.priority = filters.priority;
+    if (filters.dueDateFrom) params.dueDateFrom = toLocalDayBoundary(filters.dueDateFrom, false);
+    if (filters.dueDateTo) params.dueDateTo = toLocalDayBoundary(filters.dueDateTo, true);
+    if (filters.q.trim()) params.q = filters.q.trim();
+    return params;
+  };
+
   useEffect(() => {
     loadTasks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortByDueDate]);
+  }, [
+    sortByDueDate,
+    filters.status,
+    filters.priority,
+    filters.dueDateFrom,
+    filters.dueDateTo,
+    filters.q,
+  ]);
 
   const loadTasks = async () => {
+    // Invalid date range: don't call the API (the backend would answer 400).
+    if (dateRangeError) {
+      requestIdRef.current += 1; // invalidate any in-flight request
+      setLoading(false);
+      return;
+    }
+
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     setError(null);
     try {
-      const response = await taskService.getAllTasks(sortByDueDate);
+      const response = await taskService.getAllTasks(buildParams());
+      if (requestId !== requestIdRef.current) return;
       if (response.success && response.data) {
         setTasks(response.data);
       }
     } catch (err) {
+      if (requestId !== requestIdRef.current) return;
       setError(err instanceof Error ? err.message : 'Failed to load tasks');
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+      }
     }
+  };
+
+  const handleFilterChange = (partial: Partial<TaskFilterValues>) => {
+    setFilters((prev) => ({ ...prev, ...partial }));
+  };
+
+  const handleClearFilters = () => {
+    setFilters(EMPTY_FILTERS);
   };
 
   const handleCreateTask = async (taskData: CreateTaskDto) => {
@@ -156,6 +220,13 @@ const TaskList: React.FC = () => {
             </div>
           </div>
 
+          <TaskFilters
+            filters={filters}
+            onChange={handleFilterChange}
+            onClear={handleClearFilters}
+            dateRangeError={dateRangeError}
+          />
+
           <div className="controls">
             <button onClick={handleNewTask} className="btn btn-primary">
               + New Task
@@ -179,9 +250,16 @@ const TaskList: React.FC = () => {
           <div className="tasks-container">
             {loading && tasks.length === 0 ? (
               <div className="loading">Loading tasks...</div>
-            ) : tasks.length === 0 ? (
+            ) : dateRangeError ? null : tasks.length === 0 ? (
               <div className="empty-state">
-                <p>No tasks yet. Create your first task to get started!</p>
+                {hasActiveFilters ? (
+                  <>
+                    <p>No tasks match your filters</p>
+                    <p>Try changing or clearing the filters.</p>
+                  </>
+                ) : (
+                  <p>No tasks yet. Create your first task to get started!</p>
+                )}
               </div>
             ) : (
               <div className="task-list">
